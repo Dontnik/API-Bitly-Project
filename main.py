@@ -35,15 +35,13 @@ if __name__ == '__main__':
 
 
     parser = argparse.ArgumentParser(
-        description='Описание что делает программа'
+        description='Данная программа сокращает ссылки и показывает количество кликов по ним'
     )
-    parser.add_argument('name', help='Ваше имя')
+    parser.add_argument('link', help='Ваша ссылка')
     args = parser.parse_args()
-    print(args.name)
     load_dotenv()
     bitly_token = os.environ['BITLY_TOKEN']
-    args = parser.parse_args(long_url)
-    parsed_url = urlparse(long_url)
+    parsed_url = urlparse(args.link)
     url_without_scheme = parsed_url.netloc + parsed_url.path
     headers = {"Authorization": f"Bearer {bitly_token}"}
 
@@ -51,6 +49,6 @@ if __name__ == '__main__':
         if is_bitlink(url_without_scheme, headers):
             print('', count_clicks(url_without_scheme, headers))
         else:
-            print('', shorten_link(long_url, headers))
+            print('', shorten_link(args.link, headers))
     except requests.exceptions.HTTPError as error:
         exit("Ошибка:  Неверная ссылка".format(error))
