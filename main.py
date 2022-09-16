@@ -1,7 +1,7 @@
 import argparse
+import logging
 import os
 from urllib.parse import urlparse
-import logging
 
 import requests
 from dotenv import load_dotenv
