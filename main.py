@@ -7,24 +7,26 @@ import requests
 from dotenv import load_dotenv
 
 
-def shorten_link(long_url, headers):
+def shorten_link(long_url, bitly_token):
     url = 'https://api-ssl.bitly.com/v4/shorten'
     payload = {'long_url': long_url}
-    response = requests.post(url, headers=headers, json=payload)
     headers = {"Authorization": f"Bearer {bitly_token}"}
+    response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     return response.json()['link']
 
 
-def count_clicks(bitlink, headers):
+def count_clicks(bitlink, bitly_token):
     url = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary'
+    headers = {"Authorization": f"Bearer {bitly_token}"}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()['total_clicks']
 
 
-def is_bitlink(bitlink, headers):
+def is_bitlink(bitlink, bitly_token):
     url = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}'
+    headers = {"Authorization": f"Bearer {bitly_token}"}
     response = requests.get(url, headers=headers)
     return response.ok
 
@@ -41,9 +43,9 @@ if __name__ == '__main__':
     url_without_scheme = f'{parsed_url.netloc}{parsed_url.path}'
 
     try:
-        if is_bitlink(url_without_scheme, headers):
-            print('', count_clicks(url_without_scheme, headers))
+        if is_bitlink(url_without_scheme, bitly_token):
+            print('', count_clicks(url_without_scheme, bitly_token))
         else:
-            print('', shorten_link(args.link, headers))
-    except requests.exceptions.HTTPError as error:
-       logging.error("Ошибка:  Неверная ссылка".format(error))
+            print('', shorten_link(args.link, bitly_token))
+    except requests.exceptions.HTTPError:
+       logging.exception("Ошибка:  Неверная ссылка")
